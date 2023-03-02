@@ -1,7 +1,8 @@
-import gym
-from gym import spaces
-import pygame
 import numpy as np
+import pygame
+
+import gymnasium as gym
+from gymnasium import spaces
 
 
 class GridWorldEnv(gym.Env):
@@ -24,7 +25,7 @@ class GridWorldEnv(gym.Env):
         self.action_space = spaces.Discrete(4)
 
         """
-        The following dictionary maps abstract actions from `self.action_space` to 
+        The following dictionary maps abstract actions from `self.action_space` to
         the direction we will walk in if that action is taken.
         I.e. 0 corresponds to "right", 1 to "up" etc.
         """
@@ -52,15 +53,18 @@ class GridWorldEnv(gym.Env):
         return {"agent": self._agent_location, "target": self._target_location}
 
     def _get_info(self):
-        return {"distance": np.linalg.norm(self._agent_location - self._target_location, ord=1)}
-
+        return {
+            "distance": np.linalg.norm(
+                self._agent_location - self._target_location, ord=1
+            )
+        }
+    
     def reset(self, seed=None, options=None):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
 
         # Choose the agent's location uniformly at random
-        self._agent_location = self.np_random.integers(
-            0, self.size, size=2, dtype=int)
+        self._agent_location = self.np_random.integers(0, self.size, size=2, dtype=int)
 
         # We will sample the target's location randomly until it does not coincide with the agent's location
         self._target_location = self._agent_location
@@ -76,7 +80,7 @@ class GridWorldEnv(gym.Env):
             self._render_frame()
 
         return observation, info
-
+    
     def step(self, action):
         # Map the action (element of {0,1,2,3}) to the direction we walk in
         direction = self._action_to_direction[action]
@@ -85,8 +89,7 @@ class GridWorldEnv(gym.Env):
             self._agent_location + direction, 0, self.size - 1
         )
         # An episode is done iff the agent has reached the target
-        terminated = np.array_equal(
-            self._agent_location, self._target_location)
+        terminated = np.array_equal(self._agent_location, self._target_location)
         reward = 1 if terminated else 0  # Binary sparse rewards
         observation = self._get_obs()
         info = self._get_info()
@@ -105,7 +108,8 @@ class GridWorldEnv(gym.Env):
             pygame.init()
             pygame.display.init()
             self.window = pygame.display.set_mode(
-                (self.window_size, self.window_size))
+                (self.window_size, self.window_size)
+            )
         if self.clock is None and self.render_mode == "human":
             self.clock = pygame.time.Clock()
 

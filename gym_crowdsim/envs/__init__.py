@@ -1,0 +1,1 @@
+from gym_crowdsim.envs.grid_world import GridWorldEnv
